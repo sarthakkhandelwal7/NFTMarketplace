@@ -1,0 +1,7 @@
+service : {
+  check_is_listed: (principal) -> (bool) query;
+  get_canisterID: () -> (principal) query;
+  get_owner_nft: (principal) -> (vec principal) query;
+  list_item: (principal, nat) -> (text);
+  mint: (vec nat8, text) -> (principal);
+}
