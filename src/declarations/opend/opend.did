@@ -1,7 +1,11 @@
 service : {
   check_is_listed: (principal) -> (bool) query;
+  complete_purchase: (principal, principal, principal) -> (text);
   get_canisterID: () -> (principal) query;
+  get_listed_NFTs: () -> (vec principal) query;
+  get_original_owner: (principal) -> (principal) query;
   get_owner_nft: (principal) -> (vec principal) query;
+  get_price: (principal) -> (nat) query;
   list_item: (principal, nat) -> (text);
   mint: (vec nat8, text) -> (principal);
 }

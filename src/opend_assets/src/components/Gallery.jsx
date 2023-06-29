@@ -4,11 +4,12 @@ import { Principal } from '@dfinity/principal'
 
 function Gallery(props) {
   const [items, setItems] = useState();
+  
 
   function fetchNFTs(){
     if (props.ids != undefined){
       setItems(
-        props.ids.map((nftID) => (<Item id={nftID} key={nftID.toText()}/>))
+        props.ids.map((nftID) => (<Item id={nftID} key={nftID.toText()} role={props.role}/>))
       )
     }
   }

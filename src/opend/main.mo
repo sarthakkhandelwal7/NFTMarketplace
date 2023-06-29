@@ -8,6 +8,7 @@ import Prelude "mo:base/Prelude";
 import Nat "mo:base/Nat";
 import Text "mo:base/Text";
 import Bool "mo:base/Bool";
+import Iter "mo:base/Iter";
 
 actor OpenD {
 
@@ -41,6 +42,7 @@ actor OpenD {
 
     };
 
+
     private func add_owner(owner_id: Principal, nft_id: Principal) {
         var owner_nft: List.List<Principal> = switch(mapOfOwner.get(owner_id)) {
             case(null) { List.nil<Principal>() };
@@ -58,6 +60,12 @@ actor OpenD {
         };
 
         return List.toArray(owner_nfts);
+    };
+
+    public query func get_listed_NFTs(): async [Principal]{
+        let ids = Iter.toArray(mapOfListing.keys());
+        return ids;
+
     };
 
     public shared(msg) func list_item(id: Principal, price: Nat): async Text{
@@ -95,5 +103,47 @@ actor OpenD {
         } else {
             return true;
         }
+    };
+
+    public query func get_original_owner(id: Principal): async Principal{
+        let listing: Listing = switch(mapOfListing.get(id)){
+            case (null) return Principal.fromText("");
+            case (?result) result;
+        };
+
+        return listing.item_owner;
+    };
+
+    public query func get_price(id: Principal): async Nat{
+        let listing: Listing = switch(mapOfListing.get(id)){
+            case (null) return 0;
+            case (?result) result;
+        };
+
+        return listing.item_price;
+    };
+
+    public shared(msg) func complete_purchase(id: Principal, owner_id:Principal, new_owner_id: Principal) : async Text{
+        var purchased_nft : NFTActorClass.NFT = switch(mapOfNFTs.get(id)){
+            case (null) return "NFT not found";
+            case (?result) {result}
+        };
+        let response = await purchased_nft.transfer_ownership(new_owner_id);
+        if (response == "Success"){
+            mapOfListing.delete(id);
+            var owned_nfts: List.List<Principal> = switch(mapOfOwner.get(owner_id)) {
+                case (null) {List.nil<Principal>()};
+                case (?result) {result};
+            };
+            owned_nfts := List.filter(owned_nfts, func (item_id: Principal): Bool{
+                return item_id != id;
+            });
+            add_owner(new_owner_id, id);
+            return "Success";
+        } else {
+            return response;
+        }
+
+        
     }
 };

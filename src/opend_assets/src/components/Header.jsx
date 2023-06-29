@@ -9,10 +9,15 @@ import CURRENT_USER_ID from "../index";
 
 
 function Header() {
-  var [userOwnedGallery, setuserOwnedGallery] = useState();
+  const [userOwnedGallery, setuserOwnedGallery] = useState();
+  const [listing_gallery, set_listing_gallery] = useState();
+
   async function get_nfts(){
-    const userNftIds = await opend.get_owner_nft(CURRENT_USER_ID)
-    setuserOwnedGallery(<Gallery title="My NFT's" ids={userNftIds} />)
+    const userNftIds = await opend.get_owner_nft(CURRENT_USER_ID);
+    const listed_NFT_IDs = await opend.get_listed_NFTs();
+
+    setuserOwnedGallery(<Gallery title="My NFT's" ids={userNftIds} role="collections"/>);
+    set_listing_gallery(<Gallery title="Discover" ids={listed_NFT_IDs} role="discover"/>);
   }
 
   useEffect(() => {
@@ -49,7 +54,7 @@ function Header() {
         <img className="bottom-space" src={homeImage} />
       </Route>
       <Route path="/discover">
-        <h1>Discover</h1>
+        {listing_gallery}
       </Route>
       <Route path="/minter">
         <Minter />
